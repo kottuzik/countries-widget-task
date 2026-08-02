@@ -29,6 +29,8 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  padding-inline: 1.5rem;
+  padding-top: 1.5rem;
 }
 
 * {
@@ -46,4 +48,18 @@ a {
   html {
     color-scheme: dark;
   }
+}
+.common-gap{
+  display: flex; gap: 0.5rem;
+}
+.country-widget{
+  margin-top: 2rem;
+}
+
+.country-item{
+  margin-top: 1rem;
+  flex-direction: column;
+}
+.country-details{
+  display: flex; flex-direction: column; gap: 0.5rem;
 }
