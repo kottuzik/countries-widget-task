@@ -1,5 +1,6 @@
 "use client";
 
+import styles from "./CountriesWidget.module.css";
 import { useEffect, useState } from "react";
 
 type Currency = {
@@ -26,10 +27,9 @@ type CountriesApiResponse = {
 
 export default function CountriesWidget() {
     const [countries, setCountries] = useState<Country[]>([]);
+    const [selectedCountryCode, setSelectedCountryCode] = useState("");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-    const [searchQuery, setSearchQuery] = useState("");
-    const [selectedRegion, setSelectedRegion] = useState("");
 
     useEffect(() => {
         async function fetchCountries() {
@@ -38,7 +38,6 @@ export default function CountriesWidget() {
                 setError("");
 
                 const response = await fetch("/api/countries");
-
                 const result: CountriesApiResponse = await response.json();
 
                 if (!response.ok) {
@@ -64,111 +63,74 @@ export default function CountriesWidget() {
         fetchCountries();
     }, []);
 
-    const regions = Array.from(
-        new Set(countries.map((country) => country.region))
-    ).sort();
-
-    const filteredCountries = countries.filter((country) => {
-        const normalizedSearch = searchQuery.trim().toLowerCase();
-
-        const matchesSearch = country.name
-            .toLowerCase()
-            .startsWith(normalizedSearch);
-
-        const matchesRegion =
-            selectedRegion === "" || country.region === selectedRegion;
-
-        return matchesSearch && matchesRegion;
-    });
-
-    if (loading) {
+    const selectedCountry = countries.find(
+        (country) => country.code === selectedCountryCode
+    );
+    if(loading) {
         return <p>Loading countries...</p>;
     }
-
     if (error) {
         return <p role="alert">Error: {error}</p>;
     }
 
     return (
-        <section className="country-widget">
+        <section className={styles["country-widget"]}>
             <h2>Countries</h2>
             <p>Explore countries around the world</p>
 
-            <label htmlFor="country-search">
-                Search by country name
-            </label>
-
-            <input
-                id="country-search"
-                type="search"
-                value={searchQuery}
-                onChange={(event) => setSearchQuery(event.target.value)}
-                placeholder="For example, Israel"
-            />
-
-            <label htmlFor="region-filter">
-                Filter by region
+            <label htmlFor="country-select">
+                Choose a country
             </label>
 
             <select
-                id="region-filter"
-                value={selectedRegion}
-                onChange={(event) => setSelectedRegion(event.target.value)}
-            >
-                <option value="">All regions</option>
-
-                {regions.map((region) => (
-                    <option key={region} value={region}>
-                        {region}
+                id="country-select"
+                value={selectedCountryCode}
+                onChange={(event) =>
+                    setSelectedCountryCode(event.target.value)
+                }>
+                <option value="">Select a country</option>
+                {countries.map((country) => (
+                    <option key={country.code} value={country.code}>
+                        {country.emoji} {country.name}
                     </option>
                 ))}
             </select>
 
-            <ul>
-                {filteredCountries.map((country) => (
-                    <li
-                        className="country-item common-gap"
-                        key={country.code}
-                    >
-                        <div className="country-name common-gap">
-                            <span aria-hidden="true">{country.emoji}</span>
-                            <h3>{country.name}</h3>
-                        </div>
+            {selectedCountry && (
+                <article
+                    className="country-item common-gap"
+                    aria-live="polite">
+                    <div className="country-name common-gap">
+                        <span aria-hidden="true">
+                            {selectedCountry.emoji}
+                        </span>
+                        <h3>{selectedCountry.name}</h3>
+                    </div>
 
-                        <div className="country-details common-gap">
-                            <p>Capital: {country.capital}</p>
-                            <p>Region: {country.region}</p>
+                    <div className="country-details common-gap">
+                        <p>Capital: {selectedCountry.capital}</p>
+                        <p>Region: {selectedCountry.region}</p>
 
-                            <p>
-                                Currencies:{" "}
-                                {country.currencies.length > 0
-                                    ? country.currencies
-                                        .map(
-                                            (currency) =>
-                                                `${currency.name} (${currency.code})`
-                                        )
-                                        .join(", ")
-                                    : "Not available"}
-                            </p>
-
-                            <p>
-                                Population:{" "}
-                                {country.population.toLocaleString("en-US")}
-                            </p>
-
-                            <p>
-                                Time zones:{" "}
-                                {country.timezones.length > 0
-                                    ? country.timezones.join(", ")
-                                    : "Not available"}
-                            </p>
-                        </div>
-                    </li>
-                ))}
-            </ul>
-
-            {filteredCountries.length === 0 && (
-                <p>No countries found.</p>
+                        <p>
+                            Currencies:{" "}
+                            {selectedCountry.currencies.length > 0 ? selectedCountry.currencies
+                                .map(
+                                    (currency) => `(${currency.name}) ${currency.code}`
+                                ).join(", ") : "Not available"
+                            }
+                        </p>
+                        <p>
+                            Population:{" "}
+                            {selectedCountry.population.toLocaleString(
+                                "en-US"
+                            )}
+                        </p>
+                        <p>
+                            Time zones:{" "}
+                            {selectedCountry.timezones.length > 0 ? selectedCountry.timezones.join(", ") : "Not available"}
+                        </p>
+                    </div>
+                </article>
             )}
         </section>
     );

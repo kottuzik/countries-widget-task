@@ -1,0 +1,16 @@
+:root{
+    font-size: 16px;
+}
+
+body{
+    background-color: #666666;
+    color: #000;
+}
+.country-widget{
+    width: 40vw;
+    margin-inline: auto;
+    background-color: #fff;
+    border-radius: 20px;
+    padding: 1rem;
+    box-shadow: 5px 5px 16px -3px #000000;
+}
