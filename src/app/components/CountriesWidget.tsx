@@ -67,9 +67,11 @@ export default function CountriesWidget() {
         fetchCountries();
     }, []);
 
-    const selectedCountry = countries.find(
-        (country) => country.code === selectedCountryCode
-    );
+    const selectedCountry = selectedCountryCode
+        ? countries.find(
+            (country) => country.code === selectedCountryCode
+        )
+        : undefined;
 
     const filteredCountries = countries.filter((country) =>
         country.name
@@ -204,7 +206,7 @@ export default function CountriesWidget() {
                 )}
             </div>
 
-            {selectedCountry && (
+            {selectedCountry ? (
                 <article
                     className={styles["country-item"]}
                     aria-live="polite"
@@ -257,6 +259,13 @@ export default function CountriesWidget() {
                         </p>
                     </div>
                 </article>
+            ) : (
+                <p
+                    className={styles["start-searching"]}
+                    aria-live="polite"
+                >
+                    Start searching your country
+                </p>
             )}
         </section>
     );
